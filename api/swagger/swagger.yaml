@@ -1,0 +1,180 @@
+swagger: "2.0"
+info:
+  description: This is API for Ambition Booster
+  version: 0.0.1
+  title: Ambition Booster API
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+
+tags:
+  - name: event
+    description: Information about an event, such as a reading session, cash flow game, and so on.
+  - name: book
+    description: Information about a book which user recommend at the reading session.
+  - name: user
+    description: Information about a user.
+
+paths:
+  /events:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: events
+    get:
+      tags:
+        - event
+      description: Fetch events data
+      # used as the method name of the controller
+      operationId: getAllEvents
+      parameters: []
+      # parameters:
+      #   - name: name
+      #     in: query
+      #     description: The name of the person to whom to say hello
+      #     required: false
+      #     type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/Event"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+        - event
+      description: Cteate a new event
+      operationId: createEvent
+      parameters: []
+      responses:
+        201:
+          description: A new event created
+          schema:
+            $ref: "#/definitions/Event"
+        405:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /events/{id}:
+    x-swagger-router-controller: events
+    get:
+      tags:
+        - event
+      description: Find an event by id
+      operationId: getById
+      parameters:
+        - $ref: "#/parameters/Id"
+      responses:
+        200:
+          description: successfull operation
+          schema:
+            $ref: "#/definitions/Event"
+        404:
+          description: event not found
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+        - event
+      description: Update an existing evnet
+      operationId: update
+      parameters:
+        - $ref: "#/parameters/Id"
+      responses:
+        200:
+          description: event updated
+          schema:
+            $ref: "#/definitions/Event"
+        400:
+          description: Invalid ID supplied
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: Event not found
+          schema:
+            $ref: "#/definitions/Error"
+        405:
+          description: Validation exception
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+        - event
+      description: Delete a existing event
+      operationId: delete
+      parameters:
+        - $ref: "#/parameters/Id"
+      responses:
+        200:
+          description: Deleted an event
+        400:
+          description: Invalid ID supplied
+          schema:
+            $ref: "#/definitions/Error"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+parameters:
+  Id:
+    name: id
+    in: path
+    description: ID
+    required: true
+    type: integer
+    format: int32
+
+# complex objects have schema definitions
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: HTTP status code
+      message:
+        type: string
+        description: Eror message
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  Event:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+      title:
+        type: string
+        example: Reading Session
+  Book:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+      title:
+        type: string
+        description: Book title

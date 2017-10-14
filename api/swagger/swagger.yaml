@@ -9,34 +9,34 @@ host: localhost:10010
 basePath: /
 #
 schemes:
-  # tip: remove http to make production-grade
-  - http
-  - https
+# tip: remove http to make production-grade
+- http
+- https
 # format of bodies a client can send (Content-Type)
 consumes:
-  - application/json
+- application/json
 # format of the responses to the client (Accepts)
 produces:
-  - application/json
+- application/json
 
 tags:
-  - name: event
-    description: Information about an event, such as a reading session, cash flow game, and so on.
-  - name: book
-    description: Information about a book which user recommend at the reading session.
-  - name: user
-    description: Information about a user.
+- name: event
+  description: Information about an event, such as a reading session, cash flow game, and so on.
+- name: book
+  description: Information about a book which user recommend at the reading session.
+- name: user
+  description: Information about a user.
 
 paths:
   /events:
     # binds a127 app logic to a route
-    x-swagger-router-controller: events
+    x-swagger-router-controller: event
     get:
       tags:
-        - event
+      - event
       description: Fetch events data
       # used as the method name of the controller
-      operationId: getAllEvents
+      operationId: getAll
       parameters: []
       # parameters:
       #   - name: name
@@ -57,12 +57,19 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+
     post:
       tags:
-        - event
+      - event
       description: Cteate a new event
-      operationId: createEvent
-      parameters: []
+      operationId: create
+      parameters:
+      - name: body
+        in: body
+        description: Event information to be newly created
+        required: true
+        schema:
+          $ref: "#/definitions/NewEvent"
       responses:
         201:
           description: A new event created
@@ -72,15 +79,16 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ErrorResponse"
+
   /events/{id}:
-    x-swagger-router-controller: events
+    x-swagger-router-controller: event
     get:
       tags:
-        - event
+      - event
       description: Find an event by id
       operationId: getById
       parameters:
-        - $ref: "#/parameters/Id"
+      - $ref: "#/parameters/Id"
       responses:
         200:
           description: successfull operation
@@ -92,13 +100,20 @@ paths:
           description: unexpected error
           schema:
             $ref: "#/definitions/Error"
+
     put:
       tags:
-        - event
+      - event
       description: Update an existing evnet
       operationId: update
       parameters:
-        - $ref: "#/parameters/Id"
+      - $ref: "#/parameters/Id"
+      - name: body
+        in: body
+        description: Event information to be updated
+        required: true
+        schema:
+          $ref: "#/definitions/Event"
       responses:
         200:
           description: event updated
@@ -116,13 +131,14 @@ paths:
           description: Validation exception
           schema:
             $ref: "#/definitions/Error"
+
     delete:
       tags:
-        - event
+      - event
       description: Delete a existing event
       operationId: delete
       parameters:
-        - $ref: "#/parameters/Id"
+      - $ref: "#/parameters/Id"
       responses:
         200:
           description: Deleted an event
@@ -140,7 +156,6 @@ parameters:
     description: ID
     required: true
     type: integer
-    format: int32
 
 # complex objects have schema definitions
 definitions:
@@ -156,19 +171,36 @@ definitions:
         description: Eror message
   ErrorResponse:
     required:
-      - message
+    - message
     properties:
       message:
         type: string
+  NewEvent:
+    type: object
+    properties:
+      title:
+        type: string
+        example: Reading Session
+      date:
+        type: string
+        format: date
   Event:
     type: object
     properties:
       id:
         type: integer
-        format: int32
       title:
         type: string
         example: Reading Session
+      date:
+        type: string
+        format: date-time
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
   Book:
     type: object
     properties:

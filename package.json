@@ -8,7 +8,9 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
+    "@types/mongoose": "^4.7.23",
     "express": "^4.12.3",
+    "mongoose": "^4.12.1",
     "swagger-express-mw": "^0.1.0"
   },
   "devDependencies": {
